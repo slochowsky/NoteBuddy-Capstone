@@ -1,87 +1,67 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Note_Buddy.Data;
+using Note_Buddy.Models;
+using Note_Buddy.Repositories;
+
 
 namespace Note_Buddy.Controllers
 {
-    public class CategoryController : Controller
+    [Route("api/[controller]")]
+    [Authorize]
+    [ApiController]
+    public class CategoryController : ControllerBase
     {
-        // GET: CategoryController
-        public ActionResult Index()
+        private readonly CategoryRepository _categoryRepository;
+        private readonly UsersRepository _usersRepository;
+        public CategoryController(ApplicationDbContext context)
         {
-            return View();
+            _categoryRepository = new CategoryRepository(context);
+            _usersRepository = new UsersRepository(context);
         }
 
-        // GET: CategoryController/Details/5
-        public ActionResult Details(int id)
+        [HttpGet]
+        public IActionResult Get()
         {
-            return View();
+            var currentUser = GetCurrentUserProfile();
+            return Ok(_categoryRepository.GetByUserProfileId(currentUser.Id));
         }
 
-        // GET: CategoryController/Create
-        public ActionResult Create()
+        [HttpGet("{id}")]
+        public IActionResult Get(int id)
         {
-            return View();
+            var category = _categoryRepository.GetById(id);
+            if (category == null)
+            {
+                return NotFound();
+            }
+            return Ok(category);
         }
 
-        // POST: CategoryController/Create
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public IActionResult Post(Category category)
         {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            _categoryRepository.Add(category);
+            return CreatedAtAction("Get", new { id = category.Id }, category);
         }
 
-        // GET: CategoryController/Edit/5
-        public ActionResult Edit(int id)
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
         {
-            return View();
+            _categoryRepository.Delete(id);
+            return NoContent();
         }
 
-        // POST: CategoryController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        private Users GetCurrentUserProfile()
         {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: CategoryController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: CategoryController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            var firebaseUserId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            return _usersRepository.GetByFirebaseUserId(firebaseUserId);
         }
     }
 }

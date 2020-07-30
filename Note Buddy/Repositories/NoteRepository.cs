@@ -20,7 +20,7 @@ namespace Note_Buddy.Repositories
         {
             return _context.Note
                 .Include(p => p.Users)
-                //.Include(p => p.Category)
+                .Include(p => p.Category)
                 .ToList();
 
         }
@@ -28,14 +28,14 @@ namespace Note_Buddy.Repositories
         public Note GetById(int id)
         {
             return _context.Note.Include(p => p.Users)
-                                //.Include(p => p.Category)
+                                .Include(p => p.Category)
                                 .FirstOrDefault(p => p.Id == id);
         }
 
         public List<Note> GetByUserProfileId(int id)
         {
             return _context.Note.Include(p => p.Users)
-                            //.Include(p => p.Category)
+                            .Include(p => p.Category)
                             .ToList();
         }
 
