@@ -27,7 +27,8 @@ namespace Note_Buddy.Repositories
 
         public Category GetById(int id)
         {
-            return _context.Category.Include(p => p.User).FirstOrDefault(c => c.Id == id);
+            return _context.Category.Include(p => p.User)
+                .FirstOrDefault(c => c.Id == id);
         }
 
         public List<Category> GetByUserProfileId(int id)

@@ -6,7 +6,7 @@ using Note_Buddy.Repositories;
 using Note_Buddy.Models;
 using Note_Buddy.Data;
 
-namespace Tabloid.Controllers
+namespace Note_Buddy.Controllers
 {
     [Authorize]
     [Route("api/[controller]")]
@@ -25,7 +25,8 @@ namespace Tabloid.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok(_noteRepository.GetAll());
+            var currentUser = GetCurrentUserProfile();
+            return Ok(_noteRepository.GetByUserProfileId(currentUser.Id));
         }
 
         [HttpGet("{id}")]
@@ -39,15 +40,11 @@ namespace Tabloid.Controllers
             return Ok(post);
         }
 
-        [HttpGet("getbyuser/{id}")]
-        public IActionResult GetByUser(int id)
-        {
-            return Ok(_noteRepository.GetByUserProfileId(id));
-        }
-
         [HttpPost]
         public IActionResult Post(Note note)
         {
+            var currentUser = GetCurrentUserProfile();
+            note.UserId = currentUser.Id;
             _noteRepository.Add(note);
             return CreatedAtAction("Get", new { id = note.Id }, note);
         }

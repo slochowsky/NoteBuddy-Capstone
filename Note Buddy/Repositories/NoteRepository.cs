@@ -18,8 +18,8 @@ namespace Note_Buddy.Repositories
 
         public List<Note> GetAll()
         {
-            return _context.Note
-                .Include(p => p.Users)
+            return _context.Notes
+                .Include(p => p.User)
                 .Include(p => p.Category)
                 .ToList();
 
@@ -27,20 +27,22 @@ namespace Note_Buddy.Repositories
 
         public Note GetById(int id)
         {
-            return _context.Note.Include(p => p.Users)
+            return _context.Notes.Include(p => p.User)
                                 .Include(p => p.Category)
                                 .FirstOrDefault(p => p.Id == id);
         }
 
         public List<Note> GetByUserProfileId(int id)
         {
-            return _context.Note.Include(p => p.Users)
+            return _context.Notes.Include(p => p.User)
+                             .Where(p => p.UserId == id)
                             .Include(p => p.Category)
                             .ToList();
         }
 
         public void Add(Note note)
         {
+
             _context.Add(note);
             _context.SaveChanges();
         }
@@ -54,7 +56,7 @@ namespace Note_Buddy.Repositories
         public void Delete(int id)
         {
             var note = GetById(id);
-            _context.Note.Remove(note);
+            _context.Notes.Remove(note);
             _context.SaveChanges();
         }
     }

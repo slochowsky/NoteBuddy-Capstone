@@ -22,7 +22,7 @@ namespace Note_Buddy.Models
         [Required]
         public int UserId { get; set; }
 
-        public Users Users { get; set; }
+        public Users User { get; set; }
 
     }
 }

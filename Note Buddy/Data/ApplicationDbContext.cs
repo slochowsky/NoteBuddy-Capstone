@@ -13,6 +13,6 @@ namespace Note_Buddy.Data
 
         public DbSet<Users> Users { get; set; }
         public DbSet<Category> Category { get; set; }
-        public DbSet<Note> Note { get; set; }
+        public DbSet<Note> Notes { get; set; }
     }
 }
