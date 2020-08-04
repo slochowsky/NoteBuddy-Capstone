@@ -19,12 +19,6 @@ namespace Note_Buddy.Repositories
             _context = context;
         }
 
-        public List<Category> GetAll()
-        {
-            return _context.Category
-                .Include(c=> c.User).ToList();
-        }
-
         public Category GetById(int id)
         {
             return _context.Category.Include(p => p.User)
@@ -33,7 +27,7 @@ namespace Note_Buddy.Repositories
 
         public List<Category> GetByUserProfileId(int id)
         {
-            return _context.Category.Include(p => p.User)
+            return _context.Category.Include(p => p.User)// Using a .Include() method in the return to give us back the users category
                             .Where(p => p.UserId == id)
                             .ToList();
         }

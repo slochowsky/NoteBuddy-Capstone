@@ -37,6 +37,11 @@ namespace Note_Buddy.Controllers
         public IActionResult Get(int id)
         {
             var category = _categoryRepository.GetById(id);
+            var currentUser = GetCurrentUserProfile();
+            if (category.UserId != currentUser.Id)
+            {
+                return Unauthorized();
+            }
             if (category == null)
             {
                 return NotFound();
@@ -47,6 +52,8 @@ namespace Note_Buddy.Controllers
         [HttpPost]
         public IActionResult Post(Category category)
         {
+            var currentUser = GetCurrentUserProfile();
+            category.UserId = currentUser.Id;
             _categoryRepository.Add(category);
             return CreatedAtAction("Get", new { id = category.Id }, category);
         }
@@ -54,6 +61,12 @@ namespace Note_Buddy.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
+            var category = _categoryRepository.GetById(id);
+            var currentUser = GetCurrentUserProfile();
+            if (category.UserId != currentUser.Id)
+            {
+                return Unauthorized();
+            }
             _categoryRepository.Delete(id);
             return NoContent();
         }

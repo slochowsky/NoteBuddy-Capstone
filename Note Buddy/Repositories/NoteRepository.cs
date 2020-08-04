@@ -16,14 +16,7 @@ namespace Note_Buddy.Repositories
             _context = context;
         }
 
-        public List<Note> GetAll()
-        {
-            return _context.Notes
-                .Include(p => p.User)
-                .Include(p => p.Category)
-                .ToList();
-
-        }
+ 
 
         public Note GetById(int id)
         {

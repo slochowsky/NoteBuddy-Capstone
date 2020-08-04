@@ -15,11 +15,15 @@ namespace Note_Buddy.Controllers
     {
         private readonly NoteRepository _noteRepository;
         private readonly UsersRepository _usersRepository;
+        private readonly CategoryRepository _categoryRepository;
+
 
         public NoteController(ApplicationDbContext context)
         {
             _noteRepository = new NoteRepository(context);
             _usersRepository = new UsersRepository(context);
+            _categoryRepository = new CategoryRepository(context);
+
         }
 
         [HttpGet]
@@ -44,6 +48,11 @@ namespace Note_Buddy.Controllers
         public IActionResult Post(Note note)
         {
             var currentUser = GetCurrentUserProfile();
+            var category = _categoryRepository.GetById((int)note.CategoryId);
+            if (category.UserId != currentUser.Id)
+            {
+                return BadRequest();
+            }
             note.UserId = currentUser.Id;
             _noteRepository.Add(note);
             return CreatedAtAction("Get", new { id = note.Id }, note);
@@ -52,11 +61,15 @@ namespace Note_Buddy.Controllers
         [HttpPut("{id}")]
         public IActionResult Put(int id, Note note)
         {
+            var currentUser = GetCurrentUserProfile();
+            if (note.UserId != currentUser.Id)
+            {
+                return Unauthorized();
+            }
             if (id != note.Id)
             {
                 return BadRequest();
             }
-
             _noteRepository.Update(note);
             return NoContent();
         }
